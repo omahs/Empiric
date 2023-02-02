@@ -26,7 +26,7 @@ class CoinbaseFetcher(PublisherInterfaceT):
     async def _fetch_pair(
         self, asset: EmpiricSpotAsset, session: ClientSession
     ) -> Union[SpotEntry, PublisherFetchError]:
-        currency = asset["pair"][1]
+        currency = asset["pair"][0]
 
         async with session.get(self.BASE_URL + currency) as resp:
             result = await resp.json()
@@ -35,7 +35,7 @@ class CoinbaseFetcher(PublisherInterfaceT):
     def _fetch_pair_sync(
         self, asset: EmpiricSpotAsset
     ) -> Union[SpotEntry, PublisherFetchError]:
-        currency = asset["pair"][1]
+        currency = asset["pair"][0]
 
         resp = requests.get(self.BASE_URL + currency)
         resp.raise_for_status()
@@ -69,8 +69,8 @@ class CoinbaseFetcher(PublisherInterfaceT):
         pair = asset["pair"]
         pair_id = currency_pair_to_pair_id(*pair)
 
-        if pair[0] in result["data"]["rates"]:
-            rate = float(result["data"]["rates"][pair[0]])
+        if pair[1] in result["data"]["rates"]:
+            rate = float(result["data"]["rates"][pair[1]])
             price = 1 / rate
             price_int = int(price * (10 ** asset["decimals"]))
             timestamp = int(time.time())
